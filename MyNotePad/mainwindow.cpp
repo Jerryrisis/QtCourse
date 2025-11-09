@@ -378,4 +378,8 @@ void MainWindow::on_TextEdit_cursorPositionChanged()
 }
 
 
+void MainWindow::on_actionLineNum_triggered()
+{
+
+}
 
