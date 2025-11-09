@@ -63,7 +63,7 @@
      <string>编辑(&amp;E)</string>
     </property>
     <addaction name="actionUndo"/>
-    <addaction name="actionRestore"/>
+    <addaction name="actionRedo"/>
     <addaction name="actionCut"/>
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
@@ -120,16 +120,21 @@
    <addaction name="actionSaveAs"/>
    <addaction name="separator"/>
    <addaction name="actionUndo"/>
-   <addaction name="actionRestore"/>
+   <addaction name="actionRedo"/>
    <addaction name="actionCut"/>
    <addaction name="actionCopy"/>
    <addaction name="actionPaste"/>
    <addaction name="separator"/>
+   <addaction name="actionSearch"/>
+   <addaction name="actionReplace"/>
+   <addaction name="separator"/>
+   <addaction name="actionFontStyle"/>
    <addaction name="action_WordWrap"/>
    <addaction name="actionLineNum"/>
    <addaction name="separator"/>
    <addaction name="actionToolBar"/>
    <addaction name="actionStatusBar"/>
+   <addaction name="separator"/>
   </widget>
   <action name="actionNew">
    <property name="icon">
@@ -247,7 +252,7 @@
     <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
-  <action name="actionRestore">
+  <action name="actionRedo">
    <property name="icon">
     <iconset resource="res.qrc">
      <normaloff>:/img/restore2.png</normaloff>:/img/restore2.png</iconset>
@@ -352,6 +357,9 @@
    </property>
   </action>
   <action name="action_WordWrap">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="res.qrc">
      <normaloff>:/img/AutoLineWarp.png</normaloff>:/img/AutoLineWarp.png</iconset>
@@ -419,6 +427,9 @@
    </property>
   </action>
   <action name="actionToolBar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="res.qrc">
      <normaloff>:/img/Mytoolbar.png</normaloff>:/img/Mytoolbar.png</iconset>
@@ -434,6 +445,9 @@
    </property>
   </action>
   <action name="actionStatusBar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="res.qrc">
      <normaloff>:/img/myStatusbar.png</normaloff>:/img/myStatusbar.png</iconset>
@@ -464,6 +478,9 @@
    </property>
   </action>
   <action name="actionLineNum">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="res.qrc">
      <normaloff>:/img/ShowLineNum.png</normaloff>:/img/ShowLineNum.png</iconset>
