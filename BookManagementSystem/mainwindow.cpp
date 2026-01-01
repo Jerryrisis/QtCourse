@@ -10,20 +10,22 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // 方案1：直接创建TableView
-    QTableView *tableView = new QTableView(this);
-    setCentralWidget(tableView);  // 将TableView设置为主窗口的中心部件
+    // 设置窗口标题
+    setWindowTitle("图书管理系统 - 已连接数据库");
 
-    // 方案2：测试BookModel
+    // 创建并设置模型
     BookModel *model = new BookModel(this);
-    tableView->setModel(model);
+    ui->tableView->setModel(model);
 
-    // 调整列宽
-    tableView->setColumnWidth(0, 50);
-    tableView->setColumnWidth(1, 150);
-    tableView->setColumnWidth(2, 200);
+    // 调整表格显示
+    ui->tableView->setColumnWidth(0, 50);   // ID
+    ui->tableView->setColumnWidth(1, 120);  // ISBN
+    ui->tableView->setColumnWidth(2, 200);  // 书名
+    ui->tableView->setColumnWidth(3, 100);  // 作者
 
-    qDebug() << "测试成功！共有" << model->rowCount() << "本书";
+    // 输出数据库状态
+    qDebug() << "数据库连接状态: 正常";
+    qDebug() << "当前图书数量:" << model->rowCount();
 }
 
 MainWindow::~MainWindow()

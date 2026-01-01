@@ -170,34 +170,29 @@ bool BookModel::removeBook(int row)
     if (row < 0 || row >= m_books.size())
         return false;
 
-    beginRemoveRows(QModelIndex(), row, row);  // 通知视图开始删除行
+    int bookId = m_books.at(row)["id"].toInt();
 
-    // 从内存中移除
-    m_books.removeAt(row);
+    // 从数据库删除
+    if (DatabaseManager::instance().deleteBook(bookId)) {
+        // 从模型中删除该行
+        beginRemoveRows(QModelIndex(), row, row);
+        m_books.removeAt(row);
+        endRemoveRows();
+        return true;
+    }
 
-    endRemoveRows();  // 通知视图删除完成
-
-    // 注意：这里只是从模型中移除，还需要从数据库删除
-    // 数据库删除将在后续与DatabaseManager整合时添加
-
-    return true;
+    return false;
 }
 
 bool BookModel::addBook(const QVariantMap &bookData)
 {
-    int newRow = m_books.size();
-
-    beginInsertRows(QModelIndex(), newRow, newRow);  // 通知视图开始插入行
-
-    // 添加到内存数据
-    m_books.append(bookData);
-
-    endInsertRows();  // 通知视图插入完成
-
-    // 注意：这里只是添加到模型，还需要添加到数据库
-    // 数据库添加将在后续与DatabaseManager整合时添加
-
-    return true;
+    // 先添加到数据库
+    if (DatabaseManager::instance().addBook(bookData)) {
+        // 成功添加到数据库后，刷新显示
+        refreshData();
+        return true;
+    }
+    return false;
 }
 
 bool BookModel::updateBook(int row, const QVariantMap &bookData)
@@ -205,17 +200,16 @@ bool BookModel::updateBook(int row, const QVariantMap &bookData)
     if (row < 0 || row >= m_books.size())
         return false;
 
-    // 更新内存数据
-    m_books[row] = bookData;
+    int bookId = m_books.at(row)["id"].toInt();
 
-    // 通知视图该行数据已更改
-    emit dataChanged(createIndex(row, 0),
-                     createIndex(row, columnCount()-1));
+    // 更新数据库
+    if (DatabaseManager::instance().updateBook(bookId, bookData)) {
+        // 更新成功后刷新数据
+        refreshData();
+        return true;
+    }
 
-    // 注意：这里只是更新模型，还需要更新数据库
-    // 数据库更新将在后续与DatabaseManager整合时添加
-
-    return true;
+    return false;
 }
 
 void BookModel::searchBooks(const QString &keyword)
@@ -235,62 +229,29 @@ int BookModel::getAvailableBooks() const
 
 void BookModel::loadBooksFromDatabase()
 {
-    m_books.clear();
+    beginResetModel();  // 通知视图数据将要重置
 
-    // 临时测试数据 - 后续会替换为从DatabaseManager获取真实数据
-    QVariantMap book1;
-    book1["id"] = 1;
-    book1["isbn"] = "978-7-302-12345-6";
-    book1["title"] = "Qt 5开发实战";
-    book1["author"] = "张三";
-    book1["publisher"] = "清华大学出版社";
-    book1["publish_date"] = "2022-01-01";
-    book1["category"] = "计算机";
-    book1["total_count"] = 5;
-    book1["available_count"] = 3;
-    book1["price"] = 89.9;
-    m_books.append(book1);
+    m_books.clear();    // 清空现有数据
 
-    QVariantMap book2;
-    book2["id"] = 2;
-    book2["isbn"] = "978-7-115-23456-7";
-    book2["title"] = "C++ Primer";
-    book2["author"] = "李四";
-    book2["publisher"] = "人民邮电出版社";
-    book2["publish_date"] = "2020-06-01";
-    book2["category"] = "计算机";
-    book2["total_count"] = 3;
-    book2["available_count"] = 0;
-    book2["price"] = 128.0;
-    m_books.append(book2);
+    // 从数据库获取真实数据
+    if (m_currentFilter.isEmpty()) {
+        // 没有搜索关键词，获取所有图书
+        m_books = DatabaseManager::instance().getAllBooks();
+    } else {
+        // 有搜索关键词，执行搜索
+        m_books = DatabaseManager::instance().searchBooks(m_currentFilter);
+    }
 
-    QVariantMap book3;
-    book3["id"] = 3;
-    book3["isbn"] = "978-7-111-34567-8";
-    book3["title"] = "深入理解计算机系统";
-    book3["author"] = "王五";
-    book3["publisher"] = "机械工业出版社";
-    book3["publish_date"] = "2019-03-15";
-    book3["category"] = "计算机";
-    book3["total_count"] = 2;
-    book3["available_count"] = 1;
-    book3["price"] = 139.0;
-    m_books.append(book3);
+    endResetModel();  // 通知视图数据重置完成
 
-    // 如果有关键词，进行筛选
-    if (!m_currentFilter.isEmpty()) {
-        QVector<QVariantMap> filteredBooks;
-        QString filter = m_currentFilter.toLower();
-
-        for (const auto &book : m_books) {
-            if (book["title"].toString().toLower().contains(filter) ||
-                book["author"].toString().toLower().contains(filter) ||
-                book["isbn"].toString().toLower().contains(filter) ||
-                book["publisher"].toString().toLower().contains(filter)) {
-                filteredBooks.append(book);
-            }
+    // 输出调试信息
+    if (m_books.isEmpty()) {
+        if (m_currentFilter.isEmpty()) {
+            qDebug() << "数据库中没有图书数据，请先添加图书";
+        } else {
+            qDebug() << "未找到包含关键词 '" << m_currentFilter << "' 的图书";
         }
-
-        m_books = filteredBooks;
+    } else {
+        qDebug() << "从数据库加载了" << m_books.size() << "本图书";
     }
 }
