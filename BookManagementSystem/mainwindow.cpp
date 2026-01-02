@@ -5,6 +5,7 @@
 #include <QTableView>
 #include <QMessageBox>
 #include "databasemanager.h"
+#include "addbookdialog.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -57,6 +58,8 @@ void MainWindow::setupConnections()
     connect(ui->actionBorrowBook, &QAction::triggered, this, &MainWindow::onBorrowBook);
     connect(ui->actionReturnBook, &QAction::triggered, this, &MainWindow::onReturnBook);
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::onAbout);
+
+    connect(ui->tableView, &QTableView::doubleClicked, this, &MainWindow::onEditBook);
 }
 
 void MainWindow::onSearch()
@@ -83,17 +86,58 @@ void MainWindow::onResetSearch()
 // 图书管理功能
 void MainWindow::onAddBook()
 {
-    QMessageBox::information(this, "提示", "添加图书功能待实现");
+    // 创建并显示对话框
+    AddBookDialog dialog(this);
+    if (dialog.exec() == QDialog::Accepted) {
+        // 用户点击了“确定”
+        QVariantMap newBookData = dialog.getBookData();
+
+        // 通过 BookModel 添加到数据库并刷新视图
+        if (m_bookModel->addBook(newBookData)) {
+            ui->statusbar->showMessage("添加图书成功！", 3000);
+            updateStatusBar(); // 更新状态栏统计信息
+        } else {
+            QMessageBox::warning(this, "错误", "添加图书失败，可能是ISBN重复或数据库错误。");
+        }
+    }
+    // 如果用户点击“取消”，则什么都不做
 }
 
 void MainWindow::onEditBook()
 {
+    // 获取当前选中的行
     QModelIndex currentIndex = ui->tableView->currentIndex();
     if (!currentIndex.isValid()) {
         QMessageBox::warning(this, "警告", "请先选择要编辑的图书！");
         return;
     }
-    QMessageBox::information(this, "提示", "编辑图书功能待实现");
+
+    int row = currentIndex.row();
+    QVariantMap bookData = m_bookModel->getBookData(row);
+
+    if (bookData.isEmpty()) {
+        QMessageBox::warning(this, "错误", "无法获取图书数据！");
+        return;
+    }
+
+    // 创建编辑对话框
+    AddBookDialog dialog(this, true);  // true表示编辑模式
+    dialog.setBookData(bookData);
+    dialog.setISBNEditable(false);  // 编辑时ISBN不可修改
+
+    if (dialog.exec() == QDialog::Accepted) {
+        QVariantMap updatedData = dialog.getBookData();
+
+        // 确保ID保持不变
+        updatedData["id"] = bookData["id"];
+
+        if (m_bookModel->updateBook(row, updatedData)) {
+            QMessageBox::information(this, "成功", "图书信息更新成功！");
+            updateStatusBar();
+        } else {
+            QMessageBox::warning(this, "错误", "更新图书信息失败！");
+        }
+    }
 }
 
 void MainWindow::onDeleteBook()

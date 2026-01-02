@@ -122,7 +122,28 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="categoryComboBox"/>
+        <widget class="QComboBox" name="categoryComboBox">
+         <item>
+          <property name="text">
+           <string>计算机</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>文学</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>历史</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>小说</string>
+          </property>
+         </item>
+        </widget>
        </item>
       </layout>
      </item>
@@ -150,7 +171,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="priceDoubleSpinBox"/>
+        <widget class="QDoubleSpinBox" name="priceDoubleSpinBox">
+         <property name="maximum">
+          <double>999.990000000000009</double>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
