@@ -102,15 +102,15 @@ bool ReaderModel::removeReader(int row)
     int readerId = m_readers.at(row)["id"].toInt();
 
     // 从数据库删除
-    // 注意：这里需要先在DatabaseManager中实现deleteReader函数
-    // 如果读者有借阅记录，应该不允许删除
+    if (DatabaseManager::instance().deleteReader(readerId)) {
+        // 从模型中删除该行
+        beginRemoveRows(QModelIndex(), row, row);
+        m_readers.removeAt(row);
+        endRemoveRows();
+        return true;
+    }
 
-    // 从模型中删除
-    beginRemoveRows(QModelIndex(), row, row);
-    m_readers.removeAt(row);
-    endRemoveRows();
-
-    return true;
+    return false;
 }
 
 bool ReaderModel::addReader(const QVariantMap &readerData)
@@ -131,10 +131,13 @@ bool ReaderModel::updateReader(int row, const QVariantMap &readerData)
     int readerId = m_readers.at(row)["id"].toInt();
 
     // 更新数据库
-    // 注意：需要先在DatabaseManager中实现updateReader函数
-    refreshData();
+    if (DatabaseManager::instance().updateReader(readerId, readerData)) {
+        // 更新成功后刷新数据
+        refreshData();
+        return true;
+    }
 
-    return true;
+    return false;
 }
 
 void ReaderModel::searchReaders(const QString &keyword)

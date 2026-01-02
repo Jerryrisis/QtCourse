@@ -33,6 +33,8 @@ public:
 
     // 读者管理
     bool addReader(const QVariantMap &readerData);
+    bool updateReader(int id, const QVariantMap &readerData);
+    bool deleteReader(int id);
     QVector<QVariantMap> getAllReaders();
     QVector<QVariantMap> searchReaders(const QString &keyword);
 

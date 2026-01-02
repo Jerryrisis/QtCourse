@@ -7,6 +7,9 @@
 #include <QShortcut>
 #include "databasemanager.h"
 #include "addbookdialog.h"
+#include "readerdialog.h"
+#include "addreaderdialog.h"
+#include "readermodel.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -210,14 +213,30 @@ void MainWindow::onRefresh()
 }
 
 // 读者管理功能
+// 添加读者
 void MainWindow::onAddReader()
 {
-    QMessageBox::information(this, "提示", "添加读者功能待实现");
+    AddReaderDialog dialog(this);
+    if (dialog.exec() == QDialog::Accepted) {
+        QVariantMap readerData = dialog.getReaderData();
+
+        // 创建临时ReaderModel来添加读者
+        ReaderModel readerModel(this);
+        if (readerModel.addReader(readerData)) {
+            QMessageBox::information(this, "成功", "读者添加成功！");
+            updateStatusBar();  // 更新主窗口状态栏
+        } else {
+            QMessageBox::warning(this, "错误", "读者添加失败！");
+        }
+    }
 }
 
+// 管理读者
 void MainWindow::onManageReaders()
 {
-    QMessageBox::information(this, "提示", "管理读者功能待实现");
+    // 打开读者管理对话框
+    ReaderDialog dialog(this);
+    dialog.exec();
 }
 
 // 借阅管理功能

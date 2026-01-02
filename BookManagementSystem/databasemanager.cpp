@@ -311,6 +311,45 @@ bool DatabaseManager::addReader(const QVariantMap &readerData)
     return query.exec();
 }
 
+
+bool DatabaseManager::updateReader(int id, const QVariantMap &readerData)
+{
+    QSqlQuery query(m_database);
+    query.prepare(R"(
+        UPDATE readers SET reader_id=?, name=?, gender=?, phone=?, email=?, address=?
+        WHERE id=?
+    )");
+
+    query.addBindValue(readerData["reader_id"]);
+    query.addBindValue(readerData["name"]);
+    query.addBindValue(readerData["gender"]);
+    query.addBindValue(readerData["phone"]);
+    query.addBindValue(readerData["email"]);
+    query.addBindValue(readerData["address"]);
+    query.addBindValue(id);
+
+    if (query.exec()) {
+        return true;
+    } else {
+        qDebug() << "更新读者失败:" << query.lastError();
+        return false;
+    }
+}
+
+bool DatabaseManager::deleteReader(int id)
+{
+    QSqlQuery query(m_database);
+    query.prepare("DELETE FROM readers WHERE id = ?");
+    query.addBindValue(id);
+
+    if (query.exec()) {
+        return true;
+    } else {
+        qDebug() << "删除读者失败:" << query.lastError();
+        return false;
+    }
+}
+
 QVector<QVariantMap> DatabaseManager::getAllReaders()
 {
     QVector<QVariantMap> readers;
