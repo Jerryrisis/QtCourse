@@ -24,6 +24,7 @@ private:
 
     void setupConnections();
     void updateStatusBar();
+    void showContextMenu(const QPoint &pos);
 
 private slots:
     // 图书管理

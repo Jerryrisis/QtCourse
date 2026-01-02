@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QTableView>
 #include <QMessageBox>
+#include <QShortcut>
 #include "databasemanager.h"
 #include "addbookdialog.h"
 
@@ -32,6 +33,10 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug() << "当前图书数量:" << m_bookModel->rowCount();
 
     setupConnections();  // 连接信号和槽
+
+    ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->tableView, &QTableView::customContextMenuRequested,
+            this, &MainWindow::showContextMenu);
 }
 
 MainWindow::~MainWindow()
@@ -60,6 +65,9 @@ void MainWindow::setupConnections()
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::onAbout);
 
     connect(ui->tableView, &QTableView::doubleClicked, this, &MainWindow::onEditBook);
+
+    QShortcut *deleteShortcut = new QShortcut(QKeySequence::Delete, this);
+    connect(deleteShortcut, &QShortcut::activated, this, &MainWindow::onDeleteBook);
 }
 
 void MainWindow::onSearch()
@@ -142,24 +150,54 @@ void MainWindow::onEditBook()
 
 void MainWindow::onDeleteBook()
 {
+    // 获取当前选中的行
     QModelIndex currentIndex = ui->tableView->currentIndex();
     if (!currentIndex.isValid()) {
         QMessageBox::warning(this, "警告", "请先选择要删除的图书！");
         return;
     }
 
+    int row = currentIndex.row();
+    QVariantMap bookData = m_bookModel->getBookData(row);
+
+    if (bookData.isEmpty()) {
+        QMessageBox::warning(this, "错误", "无法获取图书数据！");
+        return;
+    }
+
+    QString bookTitle = bookData["title"].toString();
+    QString bookISBN = bookData["isbn"].toString();
+    int availableCount = bookData["available_count"].toInt();
+    int totalCount = bookData["total_count"].toInt();
+
+    // 检查图书是否可删除
+    if (availableCount < totalCount) {
+        QMessageBox::warning(this, "无法删除",
+                             QString("图书《%1》目前有 %2 本被借出，无法删除！\n请先确保所有图书都已归还。")
+                                 .arg(bookTitle).arg(totalCount - availableCount));
+        return;
+    }
+
+    // 确认删除对话框
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "确认删除",
-                                  "确定要删除选中的图书吗？",
+                                  QString("确定要删除图书《%1》吗？\nISBN: %2\n\n删除后无法恢复！")
+                                      .arg(bookTitle).arg(bookISBN),
                                   QMessageBox::Yes | QMessageBox::No);
 
     if (reply == QMessageBox::Yes) {
-        int row = currentIndex.row();
+        // 执行删除操作
         if (m_bookModel->removeBook(row)) {
-            QMessageBox::information(this, "成功", "图书删除成功！");
+            QMessageBox::information(this, "成功", QString("图书《%1》已成功删除！").arg(bookTitle));
             updateStatusBar();
+
+            // 如果当前有搜索关键词，清空搜索
+            if (!ui->searchLineEdit->text().isEmpty()) {
+                ui->searchLineEdit->clear();
+                onResetSearch();
+            }
         } else {
-            QMessageBox::warning(this, "错误", "删除失败！");
+            QMessageBox::warning(this, "错误", "删除图书失败！可能是该图书有借阅记录。");
         }
     }
 }
@@ -226,3 +264,20 @@ void MainWindow::updateStatusBar()
     ui->statusbar->showMessage(status);
 }
 
+
+void MainWindow::showContextMenu(const QPoint &pos)
+{
+    QModelIndex index = ui->tableView->indexAt(pos);
+    if (index.isValid()) {
+        QMenu contextMenu(this);
+
+        // 添加菜单项
+        contextMenu.addAction(ui->actionEditBook);
+        contextMenu.addAction(ui->actionDeleteBook);
+        contextMenu.addSeparator();
+        contextMenu.addAction(ui->actionRefresh);
+
+        // 显示菜单
+        contextMenu.exec(ui->tableView->viewport()->mapToGlobal(pos));
+    }
+}

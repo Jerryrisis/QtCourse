@@ -35,6 +35,8 @@ public:
     int getTotalBooks() const { return m_books.size(); }
     int getAvailableBooks() const;
 
+    bool canDeleteBook(int row) const;
+
 private:
     QVector<QVariantMap> m_books;  // 存储图书数据的容器
     QStringList m_headers;         // 表格列标题

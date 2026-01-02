@@ -172,12 +172,15 @@ bool BookModel::removeBook(int row)
 
     int bookId = m_books.at(row)["id"].toInt();
 
-    // 从数据库删除
+    // 从数据库中删除
     if (DatabaseManager::instance().deleteBook(bookId)) {
         // 从模型中删除该行
         beginRemoveRows(QModelIndex(), row, row);
         m_books.removeAt(row);
         endRemoveRows();
+
+        // 更新状态信息
+        emit dataChanged(createIndex(0, 0), createIndex(rowCount()-1, columnCount()-1));
         return true;
     }
 
@@ -254,4 +257,18 @@ void BookModel::loadBooksFromDatabase()
     } else {
         qDebug() << "从数据库加载了" << m_books.size() << "本图书";
     }
+}
+
+
+bool BookModel::canDeleteBook(int row) const
+{
+    if (row < 0 || row >= m_books.size())
+        return false;
+
+    const QVariantMap &book = m_books.at(row);
+    int availableCount = book["available_count"].toInt();
+    int totalCount = book["total_count"].toInt();
+
+    // 只有当所有图书都可借时才能删除
+    return (availableCount == totalCount);
 }
