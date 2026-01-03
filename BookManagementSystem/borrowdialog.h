@@ -21,8 +21,9 @@ private slots:
     void on_searchButton_clicked();
     void on_resetButton_clicked();
     void on_refreshButton_clicked();
-    void on_borrowBookButton_clicked(); // 占位
-    void on_returnBookButton_clicked(); // 占位
+    void on_borrowBookButton_clicked();
+    void on_returnBookButton_clicked();
+    void onSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
 
 private:
     Ui::BorrowDialog *ui;

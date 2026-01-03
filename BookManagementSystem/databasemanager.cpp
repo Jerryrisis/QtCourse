@@ -441,29 +441,49 @@ bool DatabaseManager::returnBook(int recordId)
 {
     QSqlQuery query(m_database);
 
-    // 获取借阅记录的图书ID
-    query.prepare("SELECT book_id FROM borrow_records WHERE id = ?");
+    // 首先获取借阅记录的图书ID
+    query.prepare("SELECT book_id FROM borrow_records WHERE id = ? AND status = '借出'");
     query.addBindValue(recordId);
 
     if (!query.exec() || !query.next()) {
+        qDebug() << "找不到可归还的借阅记录或记录状态错误:" << recordId;
         return false;
     }
 
     int bookId = query.value(0).toInt();
 
-    // 增加图书可借数量
-    query.prepare("UPDATE books SET available_count = available_count + 1 WHERE id = ?");
-    query.addBindValue(bookId);
-    if (!query.exec()) {
+    // 开启事务
+    m_database.transaction();
+
+    try {
+        // 1. 更新借阅记录状态
+        query.prepare("UPDATE borrow_records SET return_date = ?, status = '已还' WHERE id = ?");
+        query.addBindValue(QDate::currentDate());
+        query.addBindValue(recordId);
+
+        if (!query.exec()) {
+            throw std::runtime_error("更新借阅记录失败");
+        }
+
+        // 2. 恢复图书的可借数量
+        query.prepare("UPDATE books SET available_count = available_count + 1 WHERE id = ?");
+        query.addBindValue(bookId);
+
+        if (!query.exec()) {
+            throw std::runtime_error("更新图书可借数量失败");
+        }
+
+        // 提交事务
+        m_database.commit();
+        qDebug() << "还书成功，记录ID:" << recordId << "，图书ID:" << bookId;
+        return true;
+
+    } catch (const std::exception &e) {
+        // 回滚事务
+        m_database.rollback();
+        qDebug() << "还书失败:" << e.what();
         return false;
     }
-
-    // 更新借阅记录为已还
-    query.prepare("UPDATE borrow_records SET return_date = ?, status = '已还' WHERE id = ?");
-    query.addBindValue(QDate::currentDate());
-    query.addBindValue(recordId);
-
-    return query.exec();
 }
 
 QVector<QVariantMap> DatabaseManager::getAllBorrowRecords()

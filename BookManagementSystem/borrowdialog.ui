@@ -24,28 +24,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="statusComboBox">
-       <item>
-        <property name="text">
-         <string>全部</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>借出</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>已还</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>逾期</string>
-        </property>
-       </item>
-      </widget>
+      <widget class="QComboBox" name="statusComboBox"/>
      </item>
      <item>
       <widget class="QLabel" name="label_2">

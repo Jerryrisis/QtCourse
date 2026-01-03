@@ -8,6 +8,11 @@ BorrowModel::BorrowModel(QObject *parent)
     : QAbstractTableModel(parent)
 {
     m_headers << "记录ID" << "图书" << "读者" << "借书日期" << "应还日期" << "还书日期" << "状态" << "逾期天数";
+
+    // 初始化筛选条件为空
+    m_currentStatusFilter = "";
+    m_currentKeyword = "";
+
     refreshData();
 }
 
@@ -40,21 +45,40 @@ QVariant BorrowModel::data(const QModelIndex &index, int role) const
         case 3: return record["borrow_date"]; // 借书日期
         case 4: return record["due_date"]; // 应还日期
         case 5: return record["return_date"]; // 还书日期
-        case 6: return record["status"]; // 状态
+        case 6: {
+            // 状态列：如果是借出且已逾期，显示"逾期"
+            QString status = record["status"].toString();
+            if (status == "借出") {
+                QDate dueDate = record["due_date"].toDate();
+                if (dueDate < QDate::currentDate()) {
+                    return QString("逾期");
+                }
+            }
+            return status;
+        }
         case 7: { // 逾期天数
-            int overdueDays = record["overdue_days"].toInt();
-            return overdueDays > 0 ? QString::number(overdueDays) : QVariant(""); // 未逾期不显示
+            if (record["status"].toString() == "借出") {
+                QDate dueDate = record["due_date"].toDate();
+                QDate currentDate = QDate::currentDate();
+                if (dueDate < currentDate) {
+                    int overdueDays = dueDate.daysTo(currentDate);
+                    return overdueDays;
+                }
+            }
+            return QVariant(); // 未逾期或已还，不显示天数
         }
         default: return QVariant();
         }
     }
 
     // 设置颜色：逾期记录用红色标出
-    if (role == Qt::ForegroundRole) {
+    if (role == Qt::ForegroundRole && col == 6) { // 状态列
         QString status = record["status"].toString();
-        int overdueDays = record["overdue_days"].toInt();
-        if (status == "借出" && overdueDays > 0) {
-            return QColor(Qt::red);
+        if (status == "借出") {
+            QDate dueDate = record["due_date"].toDate();
+            if (dueDate < QDate::currentDate()) {
+                return QColor(Qt::red);
+            }
         }
     }
 
@@ -90,8 +114,9 @@ void BorrowModel::refreshData()
 
 QVariantMap BorrowModel::getRecordData(int row) const
 {
-    if (row >= 0 && row < m_records.size())
+    if (row >= 0 && row < m_records.size()) {
         return m_records.at(row);
+    }
     return QVariantMap();
 }
 
@@ -103,16 +128,59 @@ void BorrowModel::setFilterStatus(const QString &status)
 
 void BorrowModel::searchRecords(const QString &keyword)
 {
-    m_currentKeyword = keyword;
+    m_currentKeyword = keyword.trimmed();
     refreshData();
 }
 
 void BorrowModel::loadDataFromDatabase()
 {
-    m_records.clear();
-    // 本次提交先加载全部记录，筛选功能下次完善
-    m_records = DatabaseManager::instance().getAllBorrowRecords();
+    beginResetModel();
 
-    // 控制台输出，方便调试
-    qDebug() << "加载了" << m_records.size() << "条借阅记录";
+    // 从数据库获取原始数据
+    QVector<QVariantMap> allRecords = DatabaseManager::instance().getAllBorrowRecords();
+    m_records.clear();
+
+    // 筛选逻辑
+    for (const auto &record : allRecords) {
+        QString status = record["status"].toString();
+        bool shouldInclude = true;
+
+        // 根据状态筛选
+        if (!m_currentStatusFilter.isEmpty() && m_currentStatusFilter != "全部") {
+            if (m_currentStatusFilter == "逾期") {
+                // 逾期状态：状态为"借出"且应还日期小于今天
+                if (status == "借出") {
+                    QDate dueDate = record["due_date"].toDate();
+                    if (dueDate >= QDate::currentDate()) {
+                        shouldInclude = false;  // 未逾期，不包含
+                    }
+                } else {
+                    shouldInclude = false;  // 不是"借出"状态，不包含
+                }
+            } else if (status != m_currentStatusFilter) {
+                shouldInclude = false;  // 状态不匹配，不包含
+            }
+        }
+
+        // 根据关键词筛选
+        if (shouldInclude && !m_currentKeyword.isEmpty()) {
+            QString bookTitle = record["book_title"].toString();
+            QString readerName = record["reader_name"].toString();
+            QString isbn = record["book_isbn"].toString();
+
+            if (!bookTitle.contains(m_currentKeyword, Qt::CaseInsensitive) &&
+                !readerName.contains(m_currentKeyword, Qt::CaseInsensitive) &&
+                !isbn.contains(m_currentKeyword, Qt::CaseInsensitive)) {
+                shouldInclude = false;
+            }
+        }
+
+        if (shouldInclude) {
+            m_records.append(record);
+        }
+    }
+
+    endResetModel();
+    qDebug() << "加载了" << m_records.size() << "条借阅记录，筛选条件：状态="
+             << m_currentStatusFilter << "，关键词=" << m_currentKeyword;
 }
