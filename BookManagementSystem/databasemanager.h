@@ -47,6 +47,9 @@ public:
     QVector<QVariantMap> getBorrowRecordsByStatus(const QString &status); // 按状态筛选
     QVector<QVariantMap> getOverdueRecords(); // 获取逾期记录
     QVector<QVariantMap> searchBorrowRecords(const QString &keyword); // 搜索
+    QVector<QVariantMap> getAvailableBooks();
+    bool readerExists(int readerId);
+    bool isBookAvailable(int bookId);
 
     // 统计数据
     int getBookCount();

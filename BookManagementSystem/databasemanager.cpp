@@ -578,6 +578,44 @@ QVector<QVariantMap> DatabaseManager::getOverdueBooks()
     return records;
 }
 
+// 获取可借的图书（available_count > 0）
+QVector<QVariantMap> DatabaseManager::getAvailableBooks()
+{
+    QVector<QVariantMap> books;
+    QSqlQuery query("SELECT * FROM books WHERE available_count > 0 ORDER BY title", m_database);
+
+    while (query.next()) {
+        QVariantMap book;
+        QSqlRecord record = query.record();
+        for (int i = 0; i < record.count(); i++) {
+            book[record.fieldName(i)] = query.value(i);
+        }
+        books.append(book);
+    }
+    return books;
+}
+
+// 检查读者是否存在
+bool DatabaseManager::readerExists(int readerId)
+{
+    QSqlQuery query(m_database);
+    query.prepare("SELECT COUNT(*) FROM readers WHERE id = ?");
+    query.addBindValue(readerId);
+    return query.exec() && query.next() && query.value(0).toInt() > 0;
+}
+
+// 检查图书是否可借
+bool DatabaseManager::isBookAvailable(int bookId)
+{
+    QSqlQuery query(m_database);
+    query.prepare("SELECT available_count FROM books WHERE id = ?");
+    query.addBindValue(bookId);
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt() > 0;
+    }
+    return false;
+}
+
 // 统计数据
 int DatabaseManager::getBookCount()
 {
