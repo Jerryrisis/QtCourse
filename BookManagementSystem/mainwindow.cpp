@@ -10,6 +10,7 @@
 #include "readerdialog.h"
 #include "addreaderdialog.h"
 #include "readermodel.h"
+#include "borrowdialog.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -242,12 +243,16 @@ void MainWindow::onManageReaders()
 // 借阅管理功能
 void MainWindow::onBorrowBook()
 {
-    QMessageBox::information(this, "提示", "借书功能待实现");
+    BorrowDialog dialog(this);
+    dialog.exec(); // 打开借阅管理总界面
+    // 注意：这里未来可以优化为直接弹出“借书”子对话框
 }
 
 void MainWindow::onReturnBook()
 {
-    QMessageBox::information(this, "提示", "还书功能待实现");
+    // 暂时也打开总界面，后续可优化
+    BorrowDialog dialog(this);
+    dialog.exec();
 }
 
 // 文件操作

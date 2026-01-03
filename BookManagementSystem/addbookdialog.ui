@@ -52,7 +52,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="isbnLineEdit"/>
+        <widget class="QLineEdit" name="isbnLineEdit">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -66,7 +73,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="titleLineEdit"/>
+        <widget class="QLineEdit" name="titleLineEdit">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -80,7 +94,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="authorLineEdit"/>
+        <widget class="QLineEdit" name="authorLineEdit">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -94,7 +115,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="publisherLineEdit"/>
+        <widget class="QLineEdit" name="publisherLineEdit">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -108,7 +136,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QDateEdit" name="dateEdit"/>
+        <widget class="QDateEdit" name="dateEdit">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -123,6 +158,12 @@
        </item>
        <item>
         <widget class="QComboBox" name="categoryComboBox">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
          <item>
           <property name="text">
            <string>计算机</string>
@@ -157,7 +198,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="countSpinBox"/>
+        <widget class="QSpinBox" name="countSpinBox">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -172,6 +220,12 @@
        </item>
        <item>
         <widget class="QDoubleSpinBox" name="priceDoubleSpinBox">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximum">
           <double>999.990000000000009</double>
          </property>
@@ -212,7 +266,7 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_9">
        <item>
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="cancelButton">
          <property name="text">
           <string>取消</string>
          </property>

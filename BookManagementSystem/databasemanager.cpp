@@ -469,20 +469,54 @@ bool DatabaseManager::returnBook(int recordId)
 QVector<QVariantMap> DatabaseManager::getAllBorrowRecords()
 {
     QVector<QVariantMap> records;
-    QSqlQuery query(R"(
-        SELECT br.*, b.title, b.isbn, r.name as reader_name, r.reader_id
+    QSqlQuery query(m_database);
+
+    // 关键查询：连接三张表，获取完整的借阅信息
+    QString sql = R"(
+        SELECT
+            br.id,
+            br.borrow_date,
+            br.due_date,
+            br.return_date,
+            br.status,
+            b.id as book_id,
+            b.title as book_title,
+            b.isbn as book_isbn,
+            r.id as reader_id,
+            r.name as reader_name,
+            r.reader_id as reader_number
         FROM borrow_records br
         LEFT JOIN books b ON br.book_id = b.id
         LEFT JOIN readers r ON br.reader_id = r.id
-        ORDER BY br.borrow_date DESC
-    )", m_database);
+        ORDER BY br.borrow_date DESC, br.id DESC
+    )";
+
+    if (!query.exec(sql)) {
+        qDebug() << "获取借阅记录失败:" << query.lastError();
+        return records;
+    }
 
     while (query.next()) {
         QVariantMap record;
-        QSqlRecord sqlRecord = query.record();
-        for (int i = 0; i < sqlRecord.count(); i++) {
-            record[sqlRecord.fieldName(i)] = query.value(i);
+        QSqlRecord rec = query.record();
+        for (int i = 0; i < rec.count(); ++i) {
+            record[rec.fieldName(i)] = query.value(i);
         }
+
+        // 计算并添加一个“逾期天数”字段（如果逾期）
+        if (record["status"].toString() == "借出") {
+            QDate dueDate = query.value("due_date").toDate();
+            QDate currentDate = QDate::currentDate();
+            if (dueDate < currentDate) {
+                int overdueDays = dueDate.daysTo(currentDate);
+                record["overdue_days"] = overdueDays;
+            } else {
+                record["overdue_days"] = 0;
+            }
+        } else {
+            record["overdue_days"] = 0;
+        }
+
         records.append(record);
     }
 

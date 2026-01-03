@@ -53,7 +53,6 @@ QVariantMap AddBookDialog::getBookData() const
     bookData["total_count"] = ui->countSpinBox->value();
     bookData["available_count"] = ui->countSpinBox->value();
     bookData["price"] = ui->priceDoubleSpinBox->value();
-    //bookData["description"] = ui->descriptionTextEdit->toPlainText().trimmed();
 
     return bookData;
 }
