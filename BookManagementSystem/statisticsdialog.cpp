@@ -36,6 +36,9 @@ StatisticsDialog::StatisticsDialog(QWidget *parent) :
     ui->bookRankingTable->verticalHeader()->setVisible(false);
     ui->readerRankingTable->verticalHeader()->setVisible(false);
 
+    ui->bookRankingTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->readerRankingTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
 }
 
 StatisticsDialog::~StatisticsDialog()

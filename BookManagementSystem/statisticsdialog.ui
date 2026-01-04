@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>500</width>
+    <height>335</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>400</width>
+    <width>500</width>
     <height>300</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>400</width>
-    <height>300</height>
+    <width>166666</width>
+    <height>1666666</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -28,6 +28,12 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="3">
     <widget class="QTabWidget" name="tabWidget">
+     <property name="minimumSize">
+      <size>
+       <width>500</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -35,97 +41,89 @@
       <attribute name="title">
        <string>📈 图书借阅排行榜</string>
       </attribute>
-      <widget class="QTableWidget" name="bookRankingTable">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>381</width>
-         <height>221</height>
-        </rect>
-       </property>
-       <property name="columnCount">
-        <number>6</number>
-       </property>
-       <column>
-        <property name="text">
-         <string>排名</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>书名</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>作者</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>ISBN</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>借阅次数</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>可借数量</string>
-        </property>
-       </column>
-      </widget>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QTableWidget" name="bookRankingTable">
+         <property name="columnCount">
+          <number>6</number>
+         </property>
+         <column>
+          <property name="text">
+           <string>排名</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>书名</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>作者</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>ISBN</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>借阅次数</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>可借数量</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
        <string>👥 读者借阅活跃榜</string>
       </attribute>
-      <widget class="QTableWidget" name="readerRankingTable">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>381</width>
-         <height>221</height>
-        </rect>
-       </property>
-       <property name="columnCount">
-        <number>6</number>
-       </property>
-       <column>
-        <property name="text">
-         <string>排名</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>姓名</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>读者编号</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>性别</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>总阅读次数</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>在借数量</string>
-        </property>
-       </column>
-      </widget>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QTableWidget" name="readerRankingTable">
+         <property name="columnCount">
+          <number>6</number>
+         </property>
+         <column>
+          <property name="text">
+           <string>排名</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>姓名</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>读者编号</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>性别</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>总阅读次数</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>在借数量</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
