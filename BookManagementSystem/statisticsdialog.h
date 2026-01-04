@@ -20,6 +20,7 @@ private slots:
     void loadBookRanking();
     void loadReaderRanking();
     void updateSummary();
+    void onExportClicked();
 
 private:
     Ui::StatisticsDialog *ui;

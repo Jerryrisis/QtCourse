@@ -2,6 +2,11 @@
 #include "ui_statisticsdialog.h"
 #include "databasemanager.h"
 #include <QDebug>
+#include <QFileDialog>
+#include <QTextStream>
+#include <QMessageBox>
+#include <QFile>
+#include <QDateTime>
 
 StatisticsDialog::StatisticsDialog(QWidget *parent) :
     QDialog(parent),
@@ -29,6 +34,7 @@ StatisticsDialog::StatisticsDialog(QWidget *parent) :
     // 连接信号槽
     connect(ui->refreshButton, &QPushButton::clicked, this, &StatisticsDialog::onRefreshClicked);
     connect(ui->closeButton, &QPushButton::clicked, this, &QDialog::accept);
+    connect(ui->exportButton, &QPushButton::clicked, this, &StatisticsDialog::onExportClicked);
 
     // 初始加载数据
     onRefreshClicked();
@@ -155,4 +161,82 @@ void StatisticsDialog::updateSummary()
     // 可以在这里添加更多统计信息展示
     qDebug() << "统计信息更新: 图书" << totalBooks << "本, 读者" << totalReaders
              << "人, 在借" << activeBorrows << "本";
+}
+
+
+void StatisticsDialog::onExportClicked()
+{
+    // 1. 弹出文件保存对话框
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    "导出数据",
+                                                    "借阅统计.csv",
+                                                    "CSV文件 (*.csv);;所有文件 (*)"
+                                                    );
+
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    // 2. 创建QFile对象并尝试打开文件
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {  // 修正这里
+        QMessageBox::warning(this, "错误", "无法创建文件！");  // 修正这里
+        return;
+    }
+
+    // 3. 写入UTF-8 BOM并创建文本流
+    file.write("\xEF\xBB\xBF");  // 添加UTF-8 BOM
+
+    QTextStream out(&file);
+    // 不再需要setCodec，因为已经添加了BOM
+
+    // 4. 判断当前是哪个标签页
+    QTableWidget *currentTable = nullptr;
+    QString reportTitle;
+
+    int currentTab = ui->tabWidget->currentIndex();
+    if (currentTab == 0) { // 图书排行榜
+        currentTable = ui->bookRankingTable;
+        reportTitle = "图书借阅排行榜";
+    } else { // 读者活跃榜
+        currentTable = ui->readerRankingTable;
+        reportTitle = "读者借阅活跃榜";
+    }
+
+    // 5. 写入文件内容
+    out << reportTitle << "\n";
+    out << "导出时间：" << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << "\n\n";
+
+    // 写入表头
+    for (int col = 0; col < currentTable->columnCount(); ++col) {
+        out << currentTable->horizontalHeaderItem(col)->text();
+        if (col < currentTable->columnCount() - 1) {
+            out << ",";
+        }
+    }
+    out << "\n";
+
+    // 写入表格数据
+    for (int row = 0; row < currentTable->rowCount(); ++row) {
+        for (int col = 0; col < currentTable->columnCount(); ++col) {
+            QTableWidgetItem *item = currentTable->item(row, col);
+            QString text = item ? item->text() : "";
+
+            // 处理特殊字符
+            if (text.contains(',') || text.contains('"') || text.contains('\n')) {
+                text.replace("\"", "\"\"");
+                out << "\"" << text << "\"";
+            } else {
+                out << text;
+            }
+
+            if (col < currentTable->columnCount() - 1) {
+                out << ",";
+            }
+        }
+        out << "\n";
+    }
+
+    file.close();
+    QMessageBox::information(this, "成功", QString("数据已成功导出到：\n%1").arg(fileName));
 }
