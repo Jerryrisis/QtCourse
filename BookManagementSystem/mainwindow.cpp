@@ -42,6 +42,209 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->tableView, &QTableView::customContextMenuRequested,
             this, &MainWindow::showContextMenu);
+
+    this->setStyleSheet(R"(
+/* ===== MainWindow 主窗口基础样式 ===== */
+QMainWindow {
+    background-color: #f8fafc; /* 柔和背景色 */
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-size: 13px;
+}
+
+/* ===== 菜单栏美化 ===== */
+QMenuBar {
+    background-color: #2c3e50; /* 深蓝背景 */
+    color: white;
+    padding: 4px 0px;
+    font-weight: 500;
+    border-bottom: 2px solid #3498db;
+}
+
+QMenuBar::item {
+    background-color: transparent;
+    padding: 6px 12px;
+    border-radius: 3px;
+    margin: 0 1px;
+}
+
+QMenuBar::item:selected {
+    background-color: #3498db; /* 选中项蓝色 */
+}
+
+QMenuBar::item:pressed {
+    background-color: #2980b9;
+}
+
+/* 下拉菜单样式 */
+QMenu {
+    background-color: white;
+    border: 1px solid #bdc3c7;
+    border-radius: 6px;
+    padding: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+QMenu::item {
+    padding: 8px 24px 8px 12px; /* 右侧留出空间 */
+    border-radius: 4px;
+    min-width: 120px;
+}
+
+QMenu::item:selected {
+    background-color: #3498db;
+    color: white;
+}
+
+QMenu::separator {
+    height: 1px;
+    background-color: #ecf0f1;
+    margin: 4px 8px;
+}
+
+/* ===== 搜索区域美化 ===== */
+/* 水平布局容器 */
+QWidget#centralwidget > QVBoxLayout > QHBoxLayout {
+    spacing: 8px; /* 控件间距 */
+    margin: 12px 4px 8px 4px;
+}
+
+/* "搜索："标签 */
+QLabel#label {
+    color: #2c3e50;
+    font-weight: bold;
+    padding: 8px 0px;
+    min-width: 40px;
+}
+
+/* 搜索输入框 */
+QLineEdit#searchLineEdit {
+    border: 2px solid #bdc3c7;
+    border-radius: 6px;
+    padding: 8px 12px;
+    background-color: white;
+    font-size: 13px;
+    min-height: 16px;
+    selection-background-color: #3498db;
+}
+
+QLineEdit#searchLineEdit:focus {
+    border-color: #3498db;
+    background-color: #f8fafc;
+}
+
+/* 搜索按钮 - 蓝色主题 */
+QPushButton#searchButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                              stop:0 #3498db, stop:1 #2980b9);
+    border: 2px solid #2980b9;
+    border-radius: 6px;
+    color: white;
+    padding: 8px 16px;
+    font-weight: bold;
+    min-width: 70px;
+}
+
+QPushButton#searchButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                              stop:0 #3cb0fd, stop:1 #3498db);
+    border-color: #3498db;
+}
+
+QPushButton#searchButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                              stop:0 #2980b9, stop:1 #3498db);
+    padding-top: 9px;
+    padding-bottom: 7px;
+}
+
+/* 重置按钮 - 灰色主题 */
+QPushButton#resetButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                              stop:0 #95a5a6, stop:1 #7f8c8d);
+    border: 2px solid #7f8c8d;
+    border-radius: 6px;
+    color: white;
+    padding: 8px 16px;
+    font-weight: bold;
+    min-width: 70px;
+}
+
+QPushButton#resetButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                              stop:0 #a0b0b2, stop:1 #95a5a6);
+    border-color: #95a5a6;
+}
+
+QPushButton#resetButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                              stop:0 #7f8c8d, stop:1 #95a5a6);
+}
+
+/* ===== 表格视图美化 ===== */
+QTableView#tableView {
+    background-color: white;
+    alternate-background-color: #f8f9fa; /* 交替行颜色 */
+    selection-background-color: #3498db; /* 选中行背景 */
+    selection-color: white; /* 选中行文字 */
+    gridline-color: #e9ecef; /* 网格线颜色 */
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    outline: 0; /* 去除焦点虚线框 */
+    font-size: 12.5px;
+}
+
+/* 表头样式 */
+QHeaderView::section {
+    background-color: #3498db; /* 蓝色表头 */
+    color: white;
+    padding: 10px 8px;
+    border: none;
+    border-right: 1px solid #2980b9; /* 列分割线 */
+    font-weight: bold;
+    font-size: 13px;
+}
+
+QHeaderView::section:last {
+    border-right: none; /* 最后一列无右边框 */
+}
+
+/* 隐藏垂直表头（行号） */
+QHeaderView#verticalHeader {
+    background-color: transparent;
+    width: 0px; /* 设置为0宽度，完全隐藏 */
+    max-width: 0px;
+    min-width: 0px;
+}
+
+/* 表格项样式 */
+QTableView::item {
+    padding: 6px 8px;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+QTableView::item:selected {
+    background-color: #2980b9; /* 选中项加深蓝色 */
+}
+
+/* 奇偶行不同颜色 */
+QTableView::item:alternate {
+    background-color: #f8f9fa;
+}
+
+/* ===== 状态栏美化 ===== */
+QStatusBar {
+    background-color: #2c3e50; /* 与菜单栏统一 */
+    color: #ecf0f1;
+    padding: 4px 8px;
+    font-size: 12px;
+    border-top: 1px solid #34495e;
+}
+
+QStatusBar::item {
+    border: none;
+    background-color: transparent;
+}
+)");
 }
 
 MainWindow::~MainWindow()
@@ -268,13 +471,13 @@ void MainWindow::onAbout()
 {
     QMessageBox::about(this, "关于图书管理系统",
                        "图书与借阅管理系统\n\n"
-                       "版本: 1.0\n"
-                       "作者: 学生作业项目\n\n"
+                       "作者: 林俊韬\n"
+                       "学号：2023414300210\n\n"
                        "功能说明:\n"
                        "• 图书信息管理\n"
                        "• 读者信息管理\n"
                        "• 图书借阅管理\n"
-                       "• 数据查询与导出");
+                       "• 图书借阅排行与读者排行（可导出）");
 }
 
 // 状态栏更新

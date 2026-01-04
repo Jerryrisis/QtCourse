@@ -40,6 +40,290 @@ BorrowDialog::BorrowDialog(QWidget *parent) :
     setupConnections();
 
     ui->returnBookButton->setEnabled(false);
+
+
+    this->setStyleSheet(R"(
+    /* ===== 对话框基础样式 ===== */
+    QDialog {
+        background-color: #f8fafc;
+        font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+        font-size: 13px;
+    }
+
+    /* ===== 顶部筛选区域样式 ===== */
+    /* 水平布局容器 */
+    QHBoxLayout#horizontalLayout {
+        spacing: 8px; /* 控件间距 */
+        margin: 12px 4px 8px 4px;
+    }
+
+    /* 标签样式 */
+    QLabel#label,    /* 状态筛选 */
+    QLabel#label_2 { /* 搜索: */
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 8px 0px;
+        min-width: 40px;
+    }
+
+    /* 状态筛选下拉框 */
+    QComboBox#statusComboBox {
+        border: 1.5px solid #d1d9e0;
+        border-radius: 4px;
+        padding: 8px 12px;
+        background-color: white;
+        font-size: 13px;
+        min-height: 20px;
+        min-width: 120px;
+        padding-right: 30px; /* 为下拉箭头留空间 */
+    }
+
+    QComboBox#statusComboBox:focus {
+        border-color: #1a73e8;
+        background-color: white;
+    }
+
+    QComboBox#statusComboBox::drop-down {
+        border: none;
+        width: 30px;
+        background-color: #f8fafc;
+        border-left: 1px solid #d1d9e0;
+        border-radius: 0px 3px 3px 0px;
+    }
+
+    QComboBox#statusComboBox::down-arrow {
+        width: 12px;
+        height: 12px;
+    }
+
+    /* 搜索输入框 */
+    QLineEdit#searchLineEdit {
+        border: 1.5px solid #d1d9e0;
+        border-radius: 4px;
+        padding: 8px 12px;
+        background-color: white;
+        font-size: 13px;
+        min-height: 20px;
+        min-width: 200px;
+        selection-background-color: #1a73e8;
+    }
+
+    QLineEdit#searchLineEdit:focus {
+        border-color: #1a73e8;
+        background-color: white;
+        outline: none;
+    }
+
+    /* 搜索按钮 - 蓝色主题 */
+    QPushButton#searchButton {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 13px;
+        min-width: 70px;
+        min-height: 36px;
+    }
+
+    QPushButton#searchButton:hover {
+        background-color: #0d62d9;
+    }
+
+    QPushButton#searchButton:pressed {
+        background-color: #0b57d0;
+    }
+
+    /* 重置按钮 - 灰色主题 */
+    QPushButton#resetButton {
+        background-color: #f1f3f4;
+        color: #5f6368;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 13px;
+        min-width: 70px;
+        min-height: 36px;
+    }
+
+    QPushButton#resetButton:hover {
+        background-color: #e8eaed;
+        border-color: #d2e3fc;
+    }
+
+    QPushButton#resetButton:pressed {
+        background-color: #d2e3fc;
+        color: #1a73e8;
+    }
+
+    /* ===== 借阅表格样式 ===== */
+    QTableView#tableViewBorrow {
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        alternate-background-color: #f8f9fa;
+        selection-background-color: #e8f0fe;
+        selection-color: #1a73e8;
+        gridline-color: #f1f3f4;
+        font-size: 13px;
+    }
+
+    /* 表格表头 */
+    QHeaderView::section {
+        background-color: #f8f9fa;
+        color: #5f6368;
+        padding: 10px 8px;
+        border: none;
+        border-bottom: 2px solid #e0e0e0;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    QHeaderView::section:checked {
+        background-color: #e8f0fe;
+    }
+
+    /* 隐藏垂直行号 */
+    QHeaderView#verticalHeader {
+        width: 0px;
+        max-width: 0px;
+        min-width: 0px;
+    }
+
+    /* 表格项 */
+    QTableView::item {
+        padding: 8px 8px;
+        border-bottom: 1px solid #f8f9fa;
+    }
+
+    QTableView::item:selected {
+        background-color: #e8f0fe;
+        color: #1a73e8;
+    }
+
+    /* 逾期记录特殊样式 */
+    QTableView::item[overdue="true"] {
+        color: #c5221f;
+        font-weight: 600;
+    }
+
+    /* ===== 底部按钮区域样式 ===== */
+    /* 水平布局容器 */
+    QHBoxLayout#horizontalLayout_2 {
+        spacing: 12px; /* 按钮间距 */
+        margin: 12px 4px 8px 4px;
+    }
+
+    /* 刷新按钮 - 灰色主题 */
+    QPushButton#refreshButton {
+        background-color: #f1f3f4;
+        color: #5f6368;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 13px;
+        min-width: 80px;
+        min-height: 36px;
+    }
+
+    QPushButton#refreshButton:hover {
+        background-color: #e8eaed;
+        border-color: #d2e3fc;
+    }
+
+    QPushButton#refreshButton:pressed {
+        background-color: #d2e3fc;
+        color: #1a73e8;
+    }
+
+    /* 关闭按钮 - 深灰色主题 */
+    QPushButton#closeButton {
+        background-color: #5f6368;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 13px;
+        min-width: 80px;
+        min-height: 36px;
+    }
+
+    QPushButton#closeButton:hover {
+        background-color: #3c4043;
+    }
+
+    QPushButton#closeButton:pressed {
+        background-color: #202124;
+    }
+
+    /* 借书按钮 - 蓝色主题 (主要操作) */
+    QPushButton#borrowBookButton {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 13px;
+        min-width: 80px;
+        min-height: 36px;
+    }
+
+    QPushButton#borrowBookButton:hover {
+        background-color: #0d62d9;
+    }
+
+    QPushButton#borrowBookButton:pressed {
+        background-color: #0b57d0;
+    }
+
+    /* 还书按钮 - 绿色主题 (成功操作) */
+    QPushButton#returnBookButton {
+        background-color: #34a853;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 13px;
+        min-width: 80px;
+        min-height: 36px;
+    }
+
+    QPushButton#returnBookButton:hover {
+        background-color: #2e8b47;
+    }
+
+    QPushButton#returnBookButton:pressed {
+        background-color: #2a7c3f;
+    }
+
+    /* 按钮禁用状态 */
+    QPushButton:disabled {
+        background-color: #f1f3f4;
+        color: #9aa0a6;
+        border: 1px solid #f1f3f4;
+    }
+
+    /* ===== 布局美化 ===== */
+    /* 主垂直布局 */
+    QVBoxLayout#verticalLayout {
+        spacing: 12px; /* 行间距 */
+        margin: 15px; /* 内边距 */
+    }
+
+    /* 垂直间隔器 */
+    QSpacerItem#verticalSpacer {
+        /* 自动填充空间 */
+    }
+)");
+
+
 }
 
 BorrowDialog::~BorrowDialog()

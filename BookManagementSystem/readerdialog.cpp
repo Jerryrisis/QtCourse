@@ -16,6 +16,249 @@ ReaderDialog::ReaderDialog(QWidget *parent) :
     setupTableView();
     setupConnections();
     updateStatus();
+
+    this->setStyleSheet(R"(
+    /* ===== 对话框基础样式 ===== */
+    QDialog {
+        background-color: #f8fafc;
+        font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+        font-size: 13px;
+    }
+
+    /* ===== 状态标签样式 ===== */
+    QLabel#searchStatusLabel {
+        color: #5f6368;
+        font-size: 12px;
+        padding: 6px 0px;
+        min-height: 20px;
+    }
+
+    /* ===== 搜索区域样式 ===== */
+    /* 搜索输入框 */
+    QLineEdit#searchLineEdit {
+        border: 1.5px solid #d1d9e0;
+        border-radius: 4px;
+        padding: 8px 12px;
+        background-color: white;
+        font-size: 13px;
+        min-height: 20px;
+        selection-background-color: #1a73e8;
+    }
+
+    QLineEdit#searchLineEdit:focus {
+        border-color: #1a73e8;
+        background-color: white;
+        outline: none;
+    }
+
+    /* 搜索按钮 - 蓝色主题 (主要操作) */
+    QPushButton#searchButton {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 13px;
+        min-width: 70px;
+        min-height: 36px;
+    }
+
+    QPushButton#searchButton:hover {
+        background-color: #0d62d9;
+    }
+
+    QPushButton#searchButton:pressed {
+        background-color: #0b57d0;
+    }
+
+    /* 重置按钮 - 灰色主题 (次要操作) */
+    QPushButton#resetButton {
+        background-color: #f1f3f4;
+        color: #5f6368;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 13px;
+        min-width: 70px;
+        min-height: 36px;
+    }
+
+    QPushButton#resetButton:hover {
+        background-color: #e8eaed;
+        border-color: #d2e3fc;
+    }
+
+    QPushButton#resetButton:pressed {
+        background-color: #d2e3fc;
+        color: #1a73e8;
+    }
+
+    /* ===== 读者表格样式 ===== */
+    QTableView#tableViewReaders {
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        alternate-background-color: #f8f9fa;
+        selection-background-color: #e8f0fe;
+        selection-color: #1a73e8;
+        gridline-color: #f1f3f4;
+        font-size: 13px;
+    }
+
+    /* 表格表头 */
+    QHeaderView::section {
+        background-color: #f8f9fa;
+        color: #5f6368;
+        padding: 10px 8px;
+        border: none;
+        border-bottom: 2px solid #e0e0e0;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    QHeaderView::section:checked {
+        background-color: #e8f0fe;
+    }
+
+    /* 隐藏垂直行号 */
+    QHeaderView#verticalHeader {
+        width: 0px;
+        max-width: 0px;
+        min-width: 0px;
+    }
+
+    /* 表格项 */
+    QTableView::item {
+        padding: 8px 8px;
+        border-bottom: 1px solid #f8f9fa;
+    }
+
+    QTableView::item:selected {
+        background-color: #e8f0fe;
+        color: #1a73e8;
+    }
+
+    /* ===== 操作按钮区域样式 ===== */
+    /* 添加按钮 - 蓝色主题 (主要操作) */
+    QPushButton#addButton {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 20px;
+        font-weight: 600;
+        font-size: 13px;
+        min-width: 80px;
+        min-height: 36px;
+    }
+
+    QPushButton#addButton:hover {
+        background-color: #0d62d9;
+    }
+
+    QPushButton#addButton:pressed {
+        background-color: #0b57d0;
+    }
+
+    /* 编辑按钮 - 灰色主题 (中性操作) */
+    QPushButton#editButton {
+        background-color: #f1f3f4;
+        color: #5f6368;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        padding: 8px 20px;
+        font-weight: 600;
+        font-size: 13px;
+        min-width: 80px;
+        min-height: 36px;
+    }
+
+    QPushButton#editButton:hover {
+        background-color: #e8eaed;
+        border-color: #d2e3fc;
+    }
+
+    QPushButton#editButton:pressed {
+        background-color: #d2e3fc;
+        color: #1a73e8;
+    }
+
+    /* 删除按钮 - 红色主题 (危险操作) */
+    QPushButton#deleteButton {
+        background-color: #fce8e6;
+        color: #c5221f;
+        border: 1px solid #f6aea9;
+        border-radius: 4px;
+        padding: 8px 20px;
+        font-weight: 600;
+        font-size: 13px;
+        min-width: 80px;
+        min-height: 36px;
+    }
+
+    QPushButton#deleteButton:hover {
+        background-color: #f6aea9;
+        border-color: #e37470;
+    }
+
+    QPushButton#deleteButton:pressed {
+        background-color: #e37470;
+        color: white;
+    }
+
+    /* 刷新按钮 - 灰色主题 (中性操作) */
+    QPushButton#refreshButton {
+        background-color: #f1f3f4;
+        color: #5f6368;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        padding: 8px 20px;
+        font-weight: 600;
+        font-size: 13px;
+        min-width: 80px;
+        min-height: 36px;
+    }
+
+    QPushButton#refreshButton:hover {
+        background-color: #e8eaed;
+        border-color: #d2e3fc;
+    }
+
+    QPushButton#refreshButton:pressed {
+        background-color: #d2e3fc;
+        color: #1a73e8;
+    }
+
+    /* 关闭按钮 - 灰色主题 (退出操作) */
+    QPushButton#closeButton {
+        background-color: #5f6368;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 20px;
+        font-weight: 600;
+        font-size: 13px;
+        min-width: 80px;
+        min-height: 36px;
+    }
+
+    QPushButton#closeButton:hover {
+        background-color: #3c4043;
+    }
+
+    QPushButton#closeButton:pressed {
+        background-color: #202124;
+    }
+
+    /* 按钮禁用状态 */
+    QPushButton:disabled {
+        background-color: #f1f3f4;
+        color: #9aa0a6;
+        border: 1px solid #f1f3f4;
+    }
+)");
 }
 
 ReaderDialog::~ReaderDialog()
