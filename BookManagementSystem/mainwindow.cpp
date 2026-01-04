@@ -11,6 +11,7 @@
 #include "addreaderdialog.h"
 #include "readermodel.h"
 #include "borrowdialog.h"
+#include "statisticsdialog.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -72,6 +73,7 @@ void MainWindow::setupConnections()
 
     QShortcut *deleteShortcut = new QShortcut(QKeySequence::Delete, this);
     connect(deleteShortcut, &QShortcut::activated, this, &MainWindow::onDeleteBook);
+    connect(ui->actionStatistics, &QAction::triggered, this, &MainWindow::onStatistics);
 }
 
 void MainWindow::onSearch()
@@ -304,4 +306,10 @@ void MainWindow::showContextMenu(const QPoint &pos)
         // 显示菜单
         contextMenu.exec(ui->tableView->viewport()->mapToGlobal(pos));
     }
+}
+
+void MainWindow::onStatistics()
+{
+    StatisticsDialog dialog(this);
+    dialog.exec();
 }

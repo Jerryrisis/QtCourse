@@ -663,3 +663,86 @@ int DatabaseManager::getBorrowedCount()
     }
     return 0;
 }
+
+
+QVector<QVariantMap> DatabaseManager::getBookBorrowRanking(int limit)
+{
+    QVector<QVariantMap> ranking;
+    QSqlQuery query(m_database);
+
+    QString sql = R"(
+        SELECT
+            b.id,
+            b.title,
+            b.author,
+            b.isbn,
+            COUNT(br.id) as borrow_count,
+            b.available_count
+        FROM books b
+        LEFT JOIN borrow_records br ON b.id = br.book_id
+        GROUP BY b.id, b.title, b.author, b.isbn
+        ORDER BY borrow_count DESC, b.title
+        LIMIT ?
+    )";
+
+    query.prepare(sql);
+    query.addBindValue(limit);
+
+    if (query.exec()) {
+        while (query.next()) {
+            QVariantMap bookStat;
+            bookStat["id"] = query.value("id");
+            bookStat["title"] = query.value("title");
+            bookStat["author"] = query.value("author");
+            bookStat["isbn"] = query.value("isbn");
+            bookStat["borrow_count"] = query.value("borrow_count");
+            bookStat["available_count"] = query.value("available_count");
+            ranking.append(bookStat);
+        }
+    } else {
+        qDebug() << "获取图书借阅排行失败:" << query.lastError();
+    }
+
+    return ranking;
+}
+
+QVector<QVariantMap> DatabaseManager::getReaderBorrowRanking(int limit)
+{
+    QVector<QVariantMap> ranking;
+    QSqlQuery query(m_database);
+
+    QString sql = R"(
+        SELECT
+            r.id,
+            r.reader_id,
+            r.name,
+            r.gender,
+            COUNT(br.id) as borrow_count,
+            COUNT(CASE WHEN br.status = '借出' THEN 1 END) as active_count
+        FROM readers r
+        LEFT JOIN borrow_records br ON r.id = br.reader_id
+        GROUP BY r.id, r.reader_id, r.name, r.gender
+        ORDER BY borrow_count DESC, r.name
+        LIMIT ?
+    )";
+
+    query.prepare(sql);
+    query.addBindValue(limit);
+
+    if (query.exec()) {
+        while (query.next()) {
+            QVariantMap readerStat;
+            readerStat["id"] = query.value("id");
+            readerStat["reader_id"] = query.value("reader_id");
+            readerStat["name"] = query.value("name");
+            readerStat["gender"] = query.value("gender");
+            readerStat["borrow_count"] = query.value("borrow_count");
+            readerStat["active_count"] = query.value("active_count");
+            ranking.append(readerStat);
+        }
+    } else {
+        qDebug() << "获取读者借阅排行失败:" << query.lastError();
+    }
+
+    return ranking;
+}

@@ -51,5 +51,7 @@ private slots:
     // 帮助
     void onAbout();
 
+    void onStatistics();
+
 };
 #endif // MAINWINDOW_H

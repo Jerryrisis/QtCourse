@@ -56,6 +56,11 @@ public:
     int getReaderCount();
     int getBorrowedCount();
 
+    // 借阅数据统计
+    QVector<QVariantMap> getBookBorrowRanking(int limit = 10);    // 图书借阅排行
+    QVector<QVariantMap> getReaderBorrowRanking(int limit = 10);  // 读者借阅排行
+    QVector<QVariantMap> getBorrowTrendByMonth(int months = 6);   // 借阅趋势（按月）
+
 private:
     // 私有构造函数，防止外部实例化
     explicit DatabaseManager(QObject *parent = nullptr);
