@@ -2,6 +2,7 @@
 #include "ui_addbookdialog.h"
 #include <QDate>
 #include <QDebug>
+#include <QMessageBox>
 
 AddBookDialog::AddBookDialog(QWidget *parent, bool isEditMode)
     : QDialog(parent)
@@ -184,6 +185,37 @@ AddBookDialog::~AddBookDialog()
 
 void AddBookDialog::on_okButton_clicked()
 {
+    // 获取表单数据
+    QString isbn = ui->isbnLineEdit->text().trimmed();
+    QString title = ui->titleLineEdit->text().trimmed();
+    QString author = ui->authorLineEdit->text().trimmed();
+
+    // 验证必填字段
+    if (isbn.isEmpty()) {
+        QMessageBox::warning(this, "警告", "ISBN不能为空！");
+        ui->isbnLineEdit->setFocus();  // 焦点回到ISBN输入框
+        return;
+    }
+
+    if (title.isEmpty()) {
+        QMessageBox::warning(this, "警告", "书名不能为空！");
+        ui->titleLineEdit->setFocus();
+        return;
+    }
+
+
+    // 验证作者（可选）
+    if (author.isEmpty()) {
+        int result = QMessageBox::question(this, "确认",
+                                           "作者信息为空，是否继续添加？",
+                                           QMessageBox::Yes | QMessageBox::No);
+        if (result == QMessageBox::No) {
+            ui->authorLineEdit->setFocus();
+            return;
+        }
+    }
+
+    // 所有验证通过，关闭对话框
     accept();
 }
 
@@ -243,3 +275,6 @@ void AddBookDialog::setISBNEditable(bool editable)
 {
     ui->isbnLineEdit->setReadOnly(!editable);
 }
+
+
+
